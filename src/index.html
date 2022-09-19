@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Fermion</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous" />
+</head>
+
+<body class="d-flex flex-column">
+  <header>
+    <nav class="navbar shadow">
+      <div class="container-fluid">
+        <div class="navbar-brand">
+          <img src="./assets/archimedean-spiral.svg" width="30" height="24" class="d-inline-block align-text-top">
+          <span>Fermion</span>
+        </div>
+
+        <span class="fw-light">With ❤️ by Bryan Bush</span>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container-fluid d-flex flex-column flex-grow-1 p-4">
+    <div class="row flex-grow-1">
+      <div class="col d-flex flex-column">
+        <div class="card flex-grow-1 shadow-sm">
+          <div class="card-header">Input</div>
+
+          <div class="card-body d-flex flex-column">
+            <textarea id="input" class="form-control flex-grow-1 font-monospace" style="resize: none"></textarea>
+          </div>
+        </div>
+
+        <div class="card mt-4 shadow-sm">
+          <div class="card-header">Controls</div>
+
+          <div class="card-body container">
+            <div class="row">
+              <div class="col-auto">
+                <button id="start" type="button" class="btn btn-success h-100">Start</button>
+              </div>
+
+              <div class="col">
+                <label id="concurrency-label" class="form-label pt-2">Concurrency: 1</label>
+                <input id="concurrency-input" type="range" class="form-range" min="1" step="1" value="1">
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="row">
+              <div class="col">
+                <div class="progress">
+                  <div id="progress" class="progress-bar">
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header">Output</div>
+
+          <div class="card-body d-flex flex-column">
+            <div class="flex-grow-1 position-relative">
+              <canvas id="output" class="border bg-light position-absolute top-50 start-50 translate-middle rounded"
+                width="650" height="650"></canvas>
+            </div>
+
+            <div class="d-grid mx-auto">
+              <button id="download" class="btn btn-link text-dark">Download as PNG</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

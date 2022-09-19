@@ -1,0 +1,12 @@
+html,
+body {
+  min-height: 100vh;
+}
+
+#start {
+  width: 125px;
+}
+
+.progress {
+  height: 30px;
+}

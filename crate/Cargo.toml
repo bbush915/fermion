@@ -1,0 +1,28 @@
+[package]
+name = "fermion"
+description = "A Rust → WASM ray tracer following the Ray Tracing in One Weekend book series by Peter Shirley"
+version = "1.0.0"
+authors = ["bbush915 <bushb@umich.edu>"]
+repository = "https://github.com/bbush915/fermion.git"
+license = "MIT"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+futures = "0.3.24"
+futures-channel = { version = "0.3.24" }
+getrandom = { version = "0.2.7", features = ["js"] }
+js-sys = "0.3.60"
+rand = { version = "0.8.5" }
+rayon = "1.5.3"
+serde = { version = "1.0.144", features = ["derive"] }
+serde-wasm-bindgen = "0.4.3"
+wasm-bindgen = { version = "0.2.82" }
+wasm-bindgen-futures = "0.4.33"
+wasm-bindgen-rayon = "1.0.3"
+web-sys = { version = "0.3.60", features = ["ImageData"] }
+
+[features]
+js = []
