@@ -14,7 +14,7 @@ pub use wasm_bindgen_rayon::init_thread_pool;
 
 mod raytracer;
 
-const CHUNK_SIZE: usize = 1000;
+const CHUNK_SIZE: usize = 500;
 
 type PixelColor = (u32, u32, u8, u8, u8, u8);
 

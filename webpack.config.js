@@ -15,8 +15,12 @@ module.exports = {
       directory: path.join(__dirname, "public"),
     },
   },
-  ignoreWarnings: [/Circular dependency between chunks with runtime/],
-  mode: "development",
+  ignoreWarnings: [
+    /Circular dependency between chunks with runtime/,
+    /exceed the recommended size limit/,
+    /combined asset size exceeds the recommended limit/,
+  ],
+  mode: "production",
   module: {
     rules: [
       {

@@ -1,7 +1,7 @@
 {
   "width": 600,
-  "height": 400,
-  "samples_per_pixel": 10,
+  "height": 600,
+  "samples_per_pixel": 250,
   "max_depth": 50,
   "background_color": { "r": 0.7, "g": 0.8, "b": 1.0 },
   "camera": {
@@ -9,7 +9,7 @@
     "look_at": { "x": 0, "y": 0, "z": 0 },
     "view_up": { "x": 0, "y": 1, "z": 0 },
     "vertical_field_of_view": 20,
-    "aspect_ratio": 1.5,
+    "aspect_ratio": 1,
     "aperture": 0.1,
     "focus_distance": 10,
     "time_start": 0,
