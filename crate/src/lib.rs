@@ -7,27 +7,16 @@ use futures::stream::StreamExt;
 use futures_channel::mpsc;
 use js_sys::{Promise, Uint8ClampedArray, WebAssembly};
 use rand::{seq::SliceRandom, thread_rng};
-use rayon::prelude::*;
-use serde::Deserialize;
-use wasm_bindgen::{prelude::*, JsCast};
+use rayon::{prelude::ParallelIterator, slice::ParallelSlice};
+use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue};
 
 pub use wasm_bindgen_rayon::init_thread_pool;
 
+mod raytracer;
+
+const CHUNK_SIZE: usize = 1000;
+
 type PixelColor = (u32, u32, u8, u8, u8, u8);
-
-const CHUNK_SIZE: usize = 5000;
-
-// macro_rules! console_log {
-//     ($($t:tt)*) => (crate::log(&format_args!($($t)*).to_string()))
-// }
-
-// #[wasm_bindgen]
-// extern "C" {
-//     #[wasm_bindgen(js_namespace = console)]
-//     fn log(s: &str);
-//     #[wasm_bindgen(js_namespace = console, js_name = log)]
-//     fn logv(x: &JsValue);
-// }
 
 #[wasm_bindgen]
 extern "C" {
@@ -38,37 +27,33 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-#[derive(Deserialize)]
 pub struct Scene {
-    pub width: u32,
-    pub height: u32,
-}
-
-#[wasm_bindgen]
-pub struct RenderContext {
-    promise: Promise,
-    base: usize,
-    length: usize,
-    width: u32,
-    height: u32,
-    counter: Arc<AtomicUsize>,
+    scene: raytracer::Scene,
 }
 
 #[wasm_bindgen]
 impl Scene {
     #[wasm_bindgen(constructor)]
     pub fn new(object: JsValue) -> Result<Scene, JsValue> {
-        let scene: Scene = serde_wasm_bindgen::from_value(object)?;
-        Ok(scene)
+        Ok(Scene {
+            scene: serde_wasm_bindgen::from_value(object)
+                .map_err(|e| JsValue::from(e.to_string()))?,
+        })
     }
 
-    pub fn render(self, concurrency: usize) -> RenderContext {
+    pub fn render(&self, concurrency: usize) -> RenderContext {
+        let mut scene = self.scene.clone();
+        scene.camera.initialize();
+
+        let width = self.scene.width;
+        let height = self.scene.height;
+
         // NOTE - Generate all pixels and randomly shuffle them.
 
         let mut rng = thread_rng();
 
-        let x: Vec<u32> = (0..self.height).collect();
-        let y: Vec<u32> = (0..self.width).collect();
+        let x: Vec<u32> = (0..height).collect();
+        let y: Vec<u32> = (0..width).collect();
 
         let mut pixels: Vec<(u32, u32)> = x
             .iter()
@@ -80,13 +65,10 @@ impl Scene {
 
         // NOTE - Kick off up multi-threaded render.
 
-        let mut data: Vec<u8> = vec![0; 4 * (self.width as usize) * (self.height as usize)];
+        let mut data: Vec<u8> = vec![0; 4 * (width as usize) * (height as usize)];
 
         let base = data.as_ptr() as usize;
         let length = data.len();
-
-        let width = self.width;
-        let height = self.height;
 
         let (tx, mut rx) = mpsc::unbounded::<Vec<PixelColor>>();
 
@@ -94,29 +76,22 @@ impl Scene {
             pixels
                 .par_chunks(pixels.len() / concurrency)
                 .for_each(|chunk| {
-                    let mut thread_tx = tx.clone();
+                    let mut tx_clone = tx.clone();
 
                     chunk.chunks(CHUNK_SIZE).for_each(|inner_chunk| {
-                        // for _ in 0..10000000 {}
-
                         let pixel_colors: Vec<PixelColor> = inner_chunk
                             .into_iter()
                             .map(|(x, y)| {
-                                (
-                                    *x,
-                                    *y,
-                                    (255.0 * (*x as f32 / height as f32)) as u8,
-                                    (255.0 * (*y as f32 / width as f32)) as u8,
-                                    0,
-                                    255,
-                                )
+                                let (r, g, b) = raytracer::trace_ray(&scene, *x, *y);
+
+                                (*x, *y, r, g, b, 255)
                             })
                             .collect();
 
-                        thread_tx.unbounded_send(pixel_colors).unwrap();
+                        tx_clone.unbounded_send(pixel_colors).unwrap();
                     });
 
-                    thread_tx.disconnect();
+                    tx_clone.disconnect();
                 });
         });
 
@@ -149,6 +124,16 @@ impl Scene {
             counter,
         }
     }
+}
+
+#[wasm_bindgen]
+pub struct RenderContext {
+    promise: Promise,
+    base: usize,
+    length: usize,
+    width: u32,
+    height: u32,
+    counter: Arc<AtomicUsize>,
 }
 
 #[wasm_bindgen]
