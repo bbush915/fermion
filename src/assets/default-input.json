@@ -1,7 +1,7 @@
 {
   "width": 600,
   "height": 600,
-  "samples_per_pixel": 250,
+  "samples_per_pixel": 100,
   "max_depth": 50,
   "background_color": { "r": 0.7, "g": 0.8, "b": 1.0 },
   "camera": {

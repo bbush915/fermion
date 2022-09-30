@@ -18,6 +18,9 @@ const CHUNK_SIZE: usize = 500;
 
 type PixelColor = (u32, u32, u8, u8, u8, u8);
 
+// NOTE - Lots of inspiration from the wasm-bindgen demo:
+// https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel
+
 #[wasm_bindgen]
 extern "C" {
     pub type ImageData;
